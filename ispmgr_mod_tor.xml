@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mgrdata>
+   <handler name="tor" type="xml">
+         <event name="webdomain.edit" after="yes" final="yes" base="#10000" />
+   </handler>
+   <handler name="tor_del" type="xml">
+        <event name="webdomain.delete.confirm" after="yes" base="#10000" />
+    </handler>
+<metadata name="webdomain.edit" type="form">
+   <form>
+      <page name="features">
+        <field name="tor" experience="expert">
+           <input type="checkbox" name="tor">
+	    <if value="off" hide="torname"/>
+	    <if value="off" hide="torkey"/>
+           </input>
+        </field>
+	<field name="torname">
+	    <input type="text" name="torname" maxlength="5"></input>
+	</field>
+	<field name="torkey">
+	    <input type="text" name="torkey" zoom="10"></input>
+	</field>
+      </page>
+   </form>
+</metadata>
+<lang name="ru">
+   <messages name="webdomain.edit">
+    <msg name="torkey">Private key of your TOR domain</msg>
+      <msg name="tor">Enable TOR</msg>
+	<msg name="torname">TOR custom domain start (a-z,2-7)</msg>
+    <msg name="hint_torname">Max 5 LOW CASE letters (or digits 2-7). If more - generation will be forever.</msg>
+      <msg name="hint_tor">This is to enable tor domain for this site</msg>
+    <msg name="hint_torkey">Place RSA private key in PEM format (including header and footer)</msg>
+   </messages>
+</lang>
+</mgrdata>

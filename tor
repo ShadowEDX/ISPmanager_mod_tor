@@ -1,0 +1,64 @@
+#!/bin/bash
+if [ "$PARAM_tor" = "on" ]
+then
+    if [ "$PARAM_sok" = "ok" ]
+    then
+	if [ ! -f /etc/tor/sub/$PARAM_name ]; then
+	    echo "HiddenServiceDir /var/lib/tor/$PARAM_name" >> /etc/tor/sub/$PARAM_name
+	    echo "HiddenServicePort 80 127.0.0.1:8090" >> /etc/tor/sub/$PARAM_name
+	    if [ -n "$PARAM_torname" ] && [ -z "$PARAM_torkey" ]
+	    then
+		if ! [[ "$PARAM_torname" =~ [^2-7a-z] ]]
+		then
+		    service tor restart
+		    sleep 2
+		    rm -f /var/lib/tor/$PARAM_name/*
+		    /usr/local/mgr5/addon/shallot -f /var/lib/tor/$PARAM_name/key ^$PARAM_torname
+		    tail -n +4 /var/lib/tor/$PARAM_name/key > /var/lib/tor/$PARAM_name/private_key
+	    	    #rm -f /var/lib/tor/$PARAM_name/key
+		fi
+	    fi
+	    if [ -n "$PARAM_torkey" ]
+	    then
+		service tor restart
+		sleep 2
+		rm -f /var/lib/tor/$PARAM_name/*
+		echo $PARAM_torkey > /var/lib/tor/$PARAM_name/key
+		sed -e "s/-- /--\n/; s/ --/\n--/" /var/lib/tor/$PARAM_name/key | sed "2s/ /\n/g" > /var/lib/tor/$PARAM_name/private_key
+	    else
+		echo $PARAM_torkey >> /tmp/key
+	    fi
+    	    service tor restart
+    	    sleep 1
+    	    if [ ! -f /var/lib/tor/$PARAM_name/hostname ]; then
+    		sleep 2
+    	    fi
+	    tordom=$(cat /var/lib/tor/$PARAM_name/hostname)
+    	    (/usr/local/mgr5/addon/tor2 $PARAM_name "$PARAM_aliases $tordom" $PARAM_elid > /dev/null &)
+    	    #/usr/local/mgr5/addon/tor2 $PARAM_name "$PARAM_aliases $tordom" > /dev/null
+	fi
+	cat
+    else
+	cat
+    fi
+else
+    if [ "$PARAM_tor" = "off" ]
+    then
+	if [ "$PARAM_sok" = "ok" ] && [ -f /var/lib/tor/$PARAM_name/hostname ]
+        then
+    	    tordom=$(cat /var/lib/tor/$PARAM_name/hostname)
+	    al=$(echo $PARAM_aliases | sed "s/$tordom//g")
+    	    rm -f /etc/tor/sub/$PARAM_name
+    	    rm -f /var/lib/tor/$PARAM_name/*
+    	    rmdir /var/lib/tor/$PARAM_name/authorized_clients 2> /dev/null
+	    rmdir /var/lib/tor/$PARAM_name 2> /dev/null
+    	    service tor restart
+    	    (/usr/local/mgr5/addon/tor2 $PARAM_elid "$al" > /dev/null &)
+    	    cat
+	else
+	    cat
+	fi
+    else
+	cat
+    fi
+fi

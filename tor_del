@@ -1,0 +1,15 @@
+#!/bin/bash
+if [ -n "$PARAM_elid" ] && [ "$PARAM_sok" = "ok" ]; then
+    r=$(echo "$PARAM_elid" | sed "s/,//g")
+    for n in $r
+    do
+	if [ -f /etc/tor/sub/$n ]; then
+            rm -f /etc/tor/sub/$n
+	    rm -f /var/lib/tor/$n/*
+    	    rmdir /var/lib/tor/$n/authorized_clients 2> /dev/null
+	    rmdir /var/lib/tor/$n 2> /dev/null
+	fi
+    done
+    service tor restart
+fi
+cat

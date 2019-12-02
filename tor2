@@ -1,0 +1,20 @@
+#!/bin/bash
+if [ -n "$1" ]
+then
+    if [ -z $3 ]
+    then
+	r="ERROR"
+	c=0
+	while echo $r | grep "ERROR" > /dev/null
+	do
+	    r=`/usr/local/mgr5/sbin/mgrctl -m ispmgr webdomain.edit elid=$1`
+	    sleep 1
+	    c=$(( $c + 1 ))
+	    if [ $c -gt 10 ]; then break; fi
+	done
+    fi
+    /usr/local/mgr5/sbin/mgrctl -m ispmgr webdomain.edit elid=$1 sok=ok aliases="$2" >> /dev/null
+else
+echo "Needa specify domain name"
+fi
+
